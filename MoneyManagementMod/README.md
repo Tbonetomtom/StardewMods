@@ -25,7 +25,7 @@ Launch the game.
 Open the mod configuration menu by pressing the Settings icon in the Main Menu.
 
 In the configuration menu, you can adjust the following options:
-![20230615151113_1](https://github.com/Tbonetomtom/Stardew-Mods/assets/77869292/06579b81-96a0-452c-abef-38188b053344)
+![20230615151113_1](https://github.com/Tbonetomtom/StardewMods/assets/77869292/830e481e-a99d-4778-ae1a-b5351669ee1c)
 
 Display Currency HUD: Toggle the display of the HUD that shows the current transfer amount and public money account balance.
 
