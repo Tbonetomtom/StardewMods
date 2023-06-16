@@ -20,8 +20,8 @@ namespace MoneyManagementMod
         private ModConfig? Config;
         private PublicMoney? _publicMoney;
         private Dictionary<int, Texture2D>? _backgrounds;
-        private Texture2D? _Glow;
-        Vector2 position = new(0, 100);
+        private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
+        Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
         private readonly Dictionary<long, PlayerData> _playerData = new();
 
         public override void Entry(IModHelper helper)
@@ -41,8 +41,11 @@ namespace MoneyManagementMod
             }
 
             _Glow = helper.Content.Load<Texture2D>("assets/GlowEffect.png", ContentSource.ModFolder);
+            /* This code is not included in the final version of the code.
+            // this is for debugging
             helper.ConsoleCommands.Add("player_setmoney", "Sets the player's money.\n\nUsage: player_setmoney <value>\n- value: the integer amount.", this.Commands);
             helper.ConsoleCommands.Add("public_setmoney", "Sets the public money.\n\nUsage: public_setmoney <value>\n- value: the integer amount.", this.Commands);
+            */
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.Saving += this.OnBeforeSave;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
@@ -165,7 +168,6 @@ namespace MoneyManagementMod
                 long playerID = Game1.player.UniqueMultiplayerID;
                 PlayerData playerData = _playerData[playerID];
                 
-                this.Monitor.Log($"canTax : {e.NewMenu}", LogLevel.Debug);
                 if (e.NewMenu is null)
                 {
                     playerData.DrawHUD = true;
@@ -187,7 +189,6 @@ namespace MoneyManagementMod
         }
         private void OnDayEnding(object? sender, DayEndingEventArgs e)
         {
-            this.Monitor.Log($"Money Made : {CalculateShippingBinValue()}", LogLevel.Debug);
 
             TaxMoney(CalculateShippingBinValue());
 
@@ -199,10 +200,9 @@ namespace MoneyManagementMod
             int transferAmount = (int)Math.Round(amount * taxRate);
             _publicMoney.PublicBal += transferAmount;
             Game1.player.Money -= transferAmount;
-            this.Monitor.Log($"Money Made - tax : {transferAmount}", LogLevel.Debug);
             return transferAmount;
         }
-        private void Commands(string command, string[] args)
+     /*   private void Commands(string command, string[] args)
         {
             if (command == "player_setmoney")
             {
@@ -216,7 +216,7 @@ namespace MoneyManagementMod
                 _publicMoney.PublicBal = int.Parse(args[0]);
                 this.Monitor.Log($"OK, set your money to {args[0]}.", LogLevel.Info);
             }
-        }
+        }*/
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)
@@ -229,15 +229,11 @@ namespace MoneyManagementMod
             {
                 Game1.player.CanMove = false; 
                 _publicMoney.TransferToPublic(playerData.TransferAmount);
-                int currentBal = _publicMoney.PublicBal;
-                Monitor.Log($"Global bal{currentBal}", LogLevel.Info);
             }
             else if (Config.TransferFromPublic.JustPressed())
             {
                 Game1.player.CanMove = false; 
                 _publicMoney.TransferFromPublic(playerData.TransferAmount);
-                int currentBal = _publicMoney.PublicBal;
-                Monitor.Log($"Global bal{currentBal}", LogLevel.Info);
             }
             else if (Config.LowerAmount.JustPressed())
             {
@@ -331,7 +327,6 @@ namespace MoneyManagementMod
         }
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            this.Monitor.Log($"saveLoaded!", LogLevel.Debug);
             if (Context.IsWorldReady)
             {
                 if (Game1.IsMasterGame)
