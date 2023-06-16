@@ -11,9 +11,9 @@ Run the game using SMAPI.
 # Usage
 Once the mod is installed and enabled, you can start using its features in the game. Here are the key actions and controls:
 
-Taxing: When interacting with the shop menu, players have the option to tax themselves. This deducts a percentage of their current money as tax and adds it to the public money account. The tax percentile can be configured through the mod's configuration menu.
+Taxing: When selling stuff through the shop menu or the shipping bin. The mod will deduct a percentage of their profits as tax and add it to the public money account. The tax percentile can be configured through the mod's config file.
 
-Transferring Money: Players can transfer money to and from the public money account using keybindings. By default, the "TransferToPublic" and "TransferFromPublic" keybindings are set to specific keys. These can be changed in the mod's configuration menu.
+Transferring Money: Using keybindings, players can move money to and from the public money account. The default keybindings for "TransferToPublic" and "TransferFromPublic" are up arrow and down arrow, respectively. These can be modified using the generic config menu mod or the mod's config file.
 
 HUD Display: The mod adds a HUD display that shows the player's current transfer amount and the balance of the public money account. The HUD can be toggled on or off through the mod's configuration menu.
 
