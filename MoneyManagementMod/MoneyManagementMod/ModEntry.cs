@@ -19,7 +19,6 @@ namespace MoneyManagementMod
     {
         private ModConfig? Config;
         private PublicMoney? _publicMoney;
-        private PublicMoneyMessage _publicMoneyMessage;
         private Dictionary<int, Texture2D>? _backgrounds;
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
         Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
@@ -55,10 +54,6 @@ namespace MoneyManagementMod
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
-
-
-
-
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuIntergrationForMoneyManagementMod>("spacechase0.GenericModConfigMenu");
@@ -112,23 +107,27 @@ namespace MoneyManagementMod
                 getValue: () => Config.TaxPercentile,
                 setValue: value => Config.TaxPercentile = value
             );
+            SendTaxPercentileToAllPlayers();
         }
         private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
         {
             if (Game1.IsMasterGame)
             {
                 SendPublicBalToAllPlayers();
+                SendTaxPercentileToAllPlayers();
             }
         }
-        public void SendIsTransferringMoneyToAllPlayers()
+        public void SendTaxPercentileToAllPlayers()
         {
-            PublicMoneyMessage message = new PublicMoneyMessage { _publicBalLock = _publicMoney._publicBalLock };
-            Helper.Multiplayer.SendMessage(message, "isTransferringMoneyUpdate", new[] { this.ModManifest.UniqueID });
-            return;
+            if (Game1.IsMasterGame)
+            {
+                var message = new Messages { TaxPercentile = Config.TaxPercentile };
+                Helper.Multiplayer.SendMessage(message, "TaxPercentileUpdate", new[] { this.ModManifest.UniqueID });
+            }
         }
         public void SendPublicBalToAllPlayers()
         {
-            var message = new PublicMoneyMessage { PublicBal = _publicMoney.PublicBal };
+            var message = new Messages { PublicBal = _publicMoney.PublicBal };
             Helper.Multiplayer.SendMessage(message, "PublicBalUpdate", new[] { this.ModManifest.UniqueID });
             return;
         }
@@ -136,16 +135,25 @@ namespace MoneyManagementMod
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "PublicBalUpdate")
             {
-                var message = e.ReadAs<PublicMoneyMessage>();
+                var message = e.ReadAs<Messages>();
                 _publicMoney.PublicBal = message.PublicBal;
             }
-            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "isTransferringMoneyUpdate")
+            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "TaxPercentileUpdate")
             {
-                var message = e.ReadAs<PublicMoneyMessage>();
-                isTransferringMoney = (bool)message._publicBalLock;
+                var message = e.ReadAs<Messages>();
+                Config.TaxPercentile = message.TaxPercentile;
+            }
+            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "TransferRequest" && Game1.IsMasterGame)
+            {
+                var message = e.ReadAs<Messages>();
+                if (message.TransferType == "ToPublic")
+                    _publicMoney.TransferToPublic(message.TransferAmount);
+                else
+                    _publicMoney.TransferFromPublic(message.TransferAmount);
+
+                SendPublicBalToAllPlayers();
             }
         }
-
         private void Update(object? sender, UpdateTickedEventArgs e)
         {
             if (Context.IsWorldReady)
@@ -239,23 +247,32 @@ namespace MoneyManagementMod
             PlayerData playerData = _playerData[playerID];
             int[] transferAmounts = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
             int currentIndex = Array.IndexOf(transferAmounts, playerData.TransferAmount);
-            if (Config.TransferToPublic.JustPressed())
+            if (Config.TransferToPublic.JustPressed() || Config.TransferFromPublic.JustPressed())
             {
                 if (isTransferringMoney)
                     return;
-                Game1.player.CanMove = false;
-                isTransferringMoney = true;
-                _publicMoney.TransferToPublic(playerData.TransferAmount);
-                isTransferringMoney = false;
-            }
-            else if (Config.TransferFromPublic.JustPressed())
-            {
-                if (isTransferringMoney)
-                    return;
-                Game1.player.CanMove = false;
-                isTransferringMoney = true;
-                _publicMoney.TransferFromPublic(playerData.TransferAmount);
-                isTransferringMoney = false;
+
+                if (!Game1.IsMasterGame)
+                {
+                    var message = new Messages
+                    {
+                        TransferAmount = playerData.TransferAmount,
+                        TransferType = Config.TransferToPublic.JustPressed() ? "ToPublic" : "FromPublic",
+                        PlayerID = playerID
+                    };
+                    Helper.Multiplayer.SendMessage(message, "TransferRequest", new[] { this.ModManifest.UniqueID });
+                }
+                else
+                {
+                    Game1.player.CanMove = false;
+                    isTransferringMoney = true;
+                    if (Config.TransferToPublic.JustPressed())
+                        _publicMoney.TransferToPublic(playerData.TransferAmount);
+                    else
+                        _publicMoney.TransferFromPublic(playerData.TransferAmount);
+
+                    isTransferringMoney = false;
+                }
             }
             else if (Config.LowerAmount.JustPressed())
             {

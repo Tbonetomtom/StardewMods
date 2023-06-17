@@ -57,27 +57,23 @@ namespace MoneyManagementMod
 
         public void TransferToPublic(int amount)
         {
-            
-                if (_publicBalLock)
-                    return;
-                int transferAmount = Math.Min(amount, Game1.player.Money);
-                if (transferAmount > 0)
-                {
-                    Game1.player.Money -= transferAmount;
-                    PublicBal += transferAmount;
-                    _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
-                }
-            
+            if (_publicBalLock)
+                return;
 
+            int transferAmount = Math.Min(amount, Game1.player.Money);
+            if (transferAmount > 0)
+            {
+                Game1.player.Money -= transferAmount;
+                PublicBal += transferAmount;
+                _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
+            }
         }
-
-    
         public void TransferFromPublic(int amount)
         {
-            
+
                 if (_publicBalLock)
                     return;
-                int transferAmount = Math.Min(amount, PublicBal);
+            int transferAmount = Math.Min(amount, PublicBal);
                 if (transferAmount > 0)
                 {
                     PublicBal -= transferAmount;
