@@ -53,10 +53,8 @@ namespace MoneyManagementMod
             }
             _modEntry = modEntry; // Assign the ModEntry instance to the _modEntry variable
         }
-
         public void TransferToPublic(int amount)
         {
-
             int transferAmount = Math.Min(amount, Game1.player.Money);
             if (transferAmount > 0)
             {
