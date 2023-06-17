@@ -272,6 +272,7 @@ namespace MoneyManagementMod
                         _publicMoney.TransferFromPublic(playerData.TransferAmount);
 
                     isTransferringMoney = false;
+                    Game1.player.CanMove = true;
                 }
             }
             else if (Config.LowerAmount.JustPressed())
@@ -282,6 +283,7 @@ namespace MoneyManagementMod
                 {
                     currentIndex = transferAmounts.Length - 1;
                 }
+                Game1.player.CanMove = true;
             }
             else if (Config.RaiseAmount.JustPressed())
             {
@@ -291,8 +293,8 @@ namespace MoneyManagementMod
                 {
                     currentIndex = 0;
                 }
+                Game1.player.CanMove = true;
             }
-            else Game1.player.CanMove = true;
             
             playerData.TransferAmount = transferAmounts[currentIndex];
             
