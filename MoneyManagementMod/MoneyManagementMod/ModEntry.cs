@@ -55,9 +55,6 @@ namespace MoneyManagementMod
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
-
-
-
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuIntergrationForMoneyManagementMod>("spacechase0.GenericModConfigMenu");
@@ -112,6 +109,7 @@ namespace MoneyManagementMod
                 setValue: value => Config.TaxPercentile = value
             );
         }
+
         private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
         {
             if (Game1.IsMasterGame)
@@ -119,6 +117,7 @@ namespace MoneyManagementMod
                 SendPublicBalToAllPlayers();
             }
         }
+
         public void SendPublicBalToAllPlayers()
         {
             var message = new PublicMoneyMessage { PublicBal = _publicMoney.PublicBal };
@@ -254,7 +253,9 @@ namespace MoneyManagementMod
                     currentIndex = 0;
                 }
             }
-            else Game1.player.CanMove = true;
+            else
+            
+                Game1.player.CanMove = true;
             
             playerData.TransferAmount = transferAmounts[currentIndex];
             
