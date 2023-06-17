@@ -9,7 +9,6 @@ namespace MoneyManagementMod
     public class Messages
     {
         public int PublicBal { get; set; }
-        public bool _publicBalLock { get; set; }
         public int TaxPercentile { get; set; }
         public int TransferAmount { get; set; }
         public string TransferType { get; set; }

@@ -39,7 +39,6 @@ namespace MoneyManagementMod
         public Action<int>? onPlaySound;
         private readonly ModEntry _modEntry;
 
-        public bool _publicBalLock;
 
         // public int PublicBal { get; set; }
 
@@ -57,8 +56,6 @@ namespace MoneyManagementMod
 
         public void TransferToPublic(int amount)
         {
-            if (_publicBalLock)
-                return;
 
             int transferAmount = Math.Min(amount, Game1.player.Money);
             if (transferAmount > 0)
@@ -70,9 +67,6 @@ namespace MoneyManagementMod
         }
         public void TransferFromPublic(int amount)
         {
-
-                if (_publicBalLock)
-                    return;
             int transferAmount = Math.Min(amount, PublicBal);
                 if (transferAmount > 0)
                 {
