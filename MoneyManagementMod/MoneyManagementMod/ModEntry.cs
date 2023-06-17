@@ -147,9 +147,9 @@ namespace MoneyManagementMod
             {
                 var message = e.ReadAs<Messages>();
                 if (message.TransferType == "ToPublic")
-                    _publicMoney.TransferToPublic(message.TransferAmount);
+                    _publicMoney.TransferToPublic(message.TransferAmount, message.Player);
                 else
-                    _publicMoney.TransferFromPublic(message.TransferAmount);
+                    _publicMoney.TransferFromPublic(message.TransferAmount, message.Player);
 
                 SendPublicBalToAllPlayers();
             }
@@ -258,7 +258,8 @@ namespace MoneyManagementMod
                     {
                         TransferAmount = playerData.TransferAmount,
                         TransferType = Config.TransferToPublic.JustPressed() ? "ToPublic" : "FromPublic",
-                        PlayerID = playerID
+                        PlayerID = playerID,
+                        Player = Game1.player
                     };
                     Helper.Multiplayer.SendMessage(message, "TransferRequest", new[] { this.ModManifest.UniqueID });
                 }
