@@ -23,7 +23,7 @@ namespace MoneyManagementMod
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
         Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
         private readonly Dictionary<long, PlayerData> _playerData = new();
-
+        private bool isTransferringMoney = false;
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
@@ -228,13 +228,21 @@ namespace MoneyManagementMod
             int currentIndex = Array.IndexOf(transferAmounts, playerData.TransferAmount);
             if (Config.TransferToPublic.JustPressed())
             {
+                if (isTransferringMoney)
+                    return;
                 Game1.player.CanMove = false; 
+                isTransferringMoney = true;
                 _publicMoney.TransferToPublic(playerData.TransferAmount);
+                isTransferringMoney = false;
             }
             else if (Config.TransferFromPublic.JustPressed())
             {
+                if (isTransferringMoney)
+                    return;
                 Game1.player.CanMove = false; 
+                isTransferringMoney = true;
                 _publicMoney.TransferFromPublic(playerData.TransferAmount);
+                isTransferringMoney = false;
             }
             else if (Config.LowerAmount.JustPressed())
             {
