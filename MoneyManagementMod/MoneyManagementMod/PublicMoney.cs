@@ -39,7 +39,7 @@ namespace MoneyManagementMod
         public Action<int>? onPlaySound;
         private readonly ModEntry _modEntry;
 
-        private readonly object _publicBalLock = new();
+        public bool _publicBalLock;
 
         // public int PublicBal { get; set; }
 
@@ -57,8 +57,9 @@ namespace MoneyManagementMod
 
         public void TransferToPublic(int amount)
         {
-            lock (_publicBalLock)
-            {
+            
+                if (_publicBalLock)
+                    return;
                 int transferAmount = Math.Min(amount, Game1.player.Money);
                 if (transferAmount > 0)
                 {
@@ -66,15 +67,16 @@ namespace MoneyManagementMod
                     PublicBal += transferAmount;
                     _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
                 }
-            }
+            
 
         }
 
     
         public void TransferFromPublic(int amount)
         {
-            lock (_publicBalLock)
-            {
+            
+                if (_publicBalLock)
+                    return;
                 int transferAmount = Math.Min(amount, PublicBal);
                 if (transferAmount > 0)
                 {
@@ -84,7 +86,7 @@ namespace MoneyManagementMod
                     
                     _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
                 }
-            }
+            
         } 
         public void Draw(SpriteBatch b, Vector2 position, int target)
         {

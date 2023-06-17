@@ -19,11 +19,12 @@ namespace MoneyManagementMod
     {
         private ModConfig? Config;
         private PublicMoney? _publicMoney;
+        private PublicMoneyMessage _publicMoneyMessage;
         private Dictionary<int, Texture2D>? _backgrounds;
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
         Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
         private readonly Dictionary<long, PlayerData> _playerData = new();
-        private bool isTransferringMoney = false;
+        public bool isTransferringMoney { get; set; }
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
@@ -119,6 +120,12 @@ namespace MoneyManagementMod
                 SendPublicBalToAllPlayers();
             }
         }
+        public void SendIsTransferringMoneyToAllPlayers()
+        {
+            PublicMoneyMessage message = new PublicMoneyMessage { _publicBalLock = _publicMoney._publicBalLock };
+            Helper.Multiplayer.SendMessage(message, "isTransferringMoneyUpdate", new[] { this.ModManifest.UniqueID });
+            return;
+        }
         public void SendPublicBalToAllPlayers()
         {
             var message = new PublicMoneyMessage { PublicBal = _publicMoney.PublicBal };
@@ -132,7 +139,13 @@ namespace MoneyManagementMod
                 var message = e.ReadAs<PublicMoneyMessage>();
                 _publicMoney.PublicBal = message.PublicBal;
             }
+            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "isTransferringMoneyUpdate")
+            {
+                var message = e.ReadAs<PublicMoneyMessage>();
+                isTransferringMoney = (bool)message._publicBalLock;
+            }
         }
+
         private void Update(object? sender, UpdateTickedEventArgs e)
         {
             if (Context.IsWorldReady)
@@ -230,7 +243,7 @@ namespace MoneyManagementMod
             {
                 if (isTransferringMoney)
                     return;
-                Game1.player.CanMove = false; 
+                Game1.player.CanMove = false;
                 isTransferringMoney = true;
                 _publicMoney.TransferToPublic(playerData.TransferAmount);
                 isTransferringMoney = false;
@@ -239,7 +252,7 @@ namespace MoneyManagementMod
             {
                 if (isTransferringMoney)
                     return;
-                Game1.player.CanMove = false; 
+                Game1.player.CanMove = false;
                 isTransferringMoney = true;
                 _publicMoney.TransferFromPublic(playerData.TransferAmount);
                 isTransferringMoney = false;

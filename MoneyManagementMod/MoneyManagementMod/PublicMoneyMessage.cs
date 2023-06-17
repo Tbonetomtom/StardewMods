@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace MoneyManagementMod
 {
- public class PublicMoneyMessage
+    public class PublicMoneyMessage
     {
-        public int PublicBal { get; set;}
+        public int PublicBal { get; set; }
+        public bool _publicBalLock { get; set; }
     }
 }
