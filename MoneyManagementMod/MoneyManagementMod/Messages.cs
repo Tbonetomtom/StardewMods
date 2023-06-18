@@ -12,7 +12,7 @@ namespace MoneyManagementMod
         public int PublicBal { get; set; }
         public int TaxPercentile { get; set; }
         public int TransferAmount { get; set; }
-        public string TransferType { get; set; }
+        public string? TransferType { get; set; }
         public long PlayerID { get; set; }
     }
 }

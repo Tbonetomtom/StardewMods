@@ -17,7 +17,7 @@ namespace MoneyManagementMod
 {
     public class ModEntry : Mod
     {
-        private ModConfig? Config;
+        private ModConfig Config = new();
         private PublicMoney? _publicMoney;
         private Dictionary<int, Texture2D>? _backgrounds;
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
@@ -53,7 +53,7 @@ namespace MoneyManagementMod
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
-        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuIntergrationForMoneyManagementMod>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
@@ -130,7 +130,7 @@ namespace MoneyManagementMod
             Helper.Multiplayer.SendMessage(message, "PublicBalUpdate", new[] { this.ModManifest.UniqueID });
             return;
         }
-        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        private void OnModMessageReceived(object? sender, ModMessageReceivedEventArgs e)
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "PublicBalUpdate")
             {
@@ -259,9 +259,9 @@ namespace MoneyManagementMod
                 {
                     Game1.player.CanMove = false;
                     if (Config.TransferToPublic.JustPressed())
-                        _publicMoney.TransferToPublic(playerData.TransferAmount, Game1.player.uniqueMultiplayerID);
+                        _publicMoney.TransferToPublic(playerData.TransferAmount, Game1.player.UniqueMultiplayerID);
                     else
-                        _publicMoney.TransferFromPublic(playerData.TransferAmount, Game1.player.uniqueMultiplayerID);
+                        _publicMoney.TransferFromPublic(playerData.TransferAmount, Game1.player.UniqueMultiplayerID);
                     Game1.player.CanMove = true;
                 }
             }
@@ -343,7 +343,7 @@ namespace MoneyManagementMod
                 PlayerData playerData = _playerData[playerID];
                 if (playerData.DrawHUD)
                 {
-                    if (_backgrounds.TryGetValue(playerData.TransferAmount, out Texture2D background))
+                    if (_backgrounds.TryGetValue(playerData.TransferAmount, out Texture2D? background))
                     {
                         Game1.spriteBatch.Draw(background, new Rectangle((int)position.X + 4, (int)position.Y + 8, 260, 60), Color.White);
                     }
