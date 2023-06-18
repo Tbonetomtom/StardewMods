@@ -57,27 +57,22 @@ namespace MoneyManagementMod
         public void TransferToPublic(int amount, long playerID)
         {
             var player = Game1.getFarmer(playerID);
-            int transferAmount = Math.Min(amount, player.Money);
+            int transferAmount = Math.Min(amount, Game1.player.team.GetIndividualMoney(player));
             if (transferAmount > 0)
             {
                 Game1.player.team.AddIndividualMoney(player, -transferAmount);
-                player.Money -= transferAmount;
                 PublicBal += transferAmount;
                 _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
             }
         }
         public void TransferFromPublic(int amount, long playerID)
         {
-            
             var player = Game1.getFarmer(playerID);
             int transferAmount = Math.Min(amount, PublicBal);
             if (transferAmount > 0)
             {
-                
                 PublicBal -= transferAmount;
-                player.totalMoneyEarned -= (uint)transferAmount;
-                player.Money += transferAmount;
-
+                Game1.player.team.AddIndividualMoney(player, transferAmount);
                 _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
             }
 
