@@ -8,6 +8,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Tools;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 
 
 namespace MoneyManagementMod
@@ -53,29 +54,34 @@ namespace MoneyManagementMod
             }
             _modEntry = modEntry; // Assign the ModEntry instance to the _modEntry variable
         }
-        public void TransferToPublic(int amount, Farmer player)
+        public void TransferToPublic(int amount, long playerID)
         {
+            var player = Game1.getFarmer(playerID);
             int transferAmount = Math.Min(amount, player.Money);
             if (transferAmount > 0)
             {
+                Game1.player.team.AddIndividualMoney(player, -transferAmount);
                 player.Money -= transferAmount;
                 PublicBal += transferAmount;
                 _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
             }
         }
-        public void TransferFromPublic(int amount, Farmer player)
+        public void TransferFromPublic(int amount, long playerID)
         {
-            int transferAmount = Math.Min(amount, PublicBal);
-                if (transferAmount > 0)
-                {
-                    PublicBal -= transferAmount;
-                    player.totalMoneyEarned -= (uint)transferAmount;
-                    player.Money += transferAmount;
-                    
-                    _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
-                }
             
-        } 
+            var player = Game1.getFarmer(playerID);
+            int transferAmount = Math.Min(amount, PublicBal);
+            if (transferAmount > 0)
+            {
+                
+                PublicBal -= transferAmount;
+                player.totalMoneyEarned -= (uint)transferAmount;
+                player.Money += transferAmount;
+
+                _modEntry.SendPublicBalToAllPlayers(); // Make sure to pass a reference to the ModEntry instance when creating the PublicMoney instance
+            }
+
+        }
         public void Draw(SpriteBatch b, Vector2 position, int target)
         {
             if (previousTargetValue != target)

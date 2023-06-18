@@ -14,6 +14,5 @@ namespace MoneyManagementMod
         public int TransferAmount { get; set; }
         public string TransferType { get; set; }
         public long PlayerID { get; set; }
-        public Farmer Player { get; set; }
     }
 }

@@ -23,7 +23,6 @@ namespace MoneyManagementMod
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
         Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
         private readonly Dictionary<long, PlayerData> _playerData = new();
-        public bool isTransferringMoney { get; set; }
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
@@ -147,9 +146,13 @@ namespace MoneyManagementMod
             {
                 var message = e.ReadAs<Messages>();
                 if (message.TransferType == "ToPublic")
-                    _publicMoney.TransferToPublic(message.TransferAmount, message.Player);
+                {
+                    _publicMoney.TransferToPublic(message.TransferAmount, message.PlayerID);
+                    this.Monitor.Log("ToPublic", LogLevel.Debug);
+                }
+                    
                 else
-                    _publicMoney.TransferFromPublic(message.TransferAmount, message.Player);
+                    _publicMoney.TransferFromPublic(message.TransferAmount, message.PlayerID);
 
                 SendPublicBalToAllPlayers();
             }
@@ -216,14 +219,7 @@ namespace MoneyManagementMod
 
             SendPublicBalToAllPlayers();
         }
-        private int TaxMoney(int amount)
-        {
-            decimal taxRate = Config.TaxPercentile / 100m;
-            int transferAmount = (int)Math.Round(amount * taxRate);
-            _publicMoney.PublicBal += transferAmount;
-            Game1.player.Money -= transferAmount;
-            return transferAmount;
-        }
+
      /*   private void Commands(string command, string[] args)
         {
             if (command == "player_setmoney")
@@ -249,30 +245,23 @@ namespace MoneyManagementMod
             int currentIndex = Array.IndexOf(transferAmounts, playerData.TransferAmount);
             if (Config.TransferToPublic.JustPressed() || Config.TransferFromPublic.JustPressed())
             {
-                if (isTransferringMoney)
-                    return;
-
                 if (!Game1.IsMasterGame)
                 {
                     var message = new Messages
                     {
                         TransferAmount = playerData.TransferAmount,
                         TransferType = Config.TransferToPublic.JustPressed() ? "ToPublic" : "FromPublic",
-                        PlayerID = playerID,
-                        Player = Game1.player
+                        PlayerID = playerID
                     };
                     Helper.Multiplayer.SendMessage(message, "TransferRequest", new[] { this.ModManifest.UniqueID });
                 }
                 else
                 {
                     Game1.player.CanMove = false;
-                    isTransferringMoney = true;
                     if (Config.TransferToPublic.JustPressed())
-                        _publicMoney.TransferToPublic(playerData.TransferAmount);
+                        _publicMoney.TransferToPublic(playerData.TransferAmount, Game1.player.uniqueMultiplayerID);
                     else
-                        _publicMoney.TransferFromPublic(playerData.TransferAmount);
-
-                    isTransferringMoney = false;
+                        _publicMoney.TransferFromPublic(playerData.TransferAmount, Game1.player.uniqueMultiplayerID);
                     Game1.player.CanMove = true;
                 }
             }
@@ -429,6 +418,14 @@ namespace MoneyManagementMod
             }
 
             return totalValue;
+        }
+        private int TaxMoney(int amount)
+        {
+            decimal taxRate = Config.TaxPercentile / 100m;
+            int transferAmount = (int)Math.Round(amount * taxRate);
+            _publicMoney.PublicBal += transferAmount;
+            Game1.player.Money -= transferAmount;
+            return transferAmount;
         }
     }
     public class MoneyMenu : IClickableMenu
