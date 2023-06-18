@@ -82,38 +82,42 @@ namespace MoneyManagementMod
                 getValue: () => Config.DistributeShippingBinMoneyEqually,
                 setValue: value => Config.DistributeShippingBinMoneyEqually = value
             );
+            configMenu.AddSectionTitle(
+               mod: this.ModManifest,
+               text: () => "Keybinds"
+           );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Withdraw From Public Account",
-                getValue: () => Config.TransferFromPublic,
-                setValue: value => Config.TransferFromPublic = value
+                getValue: () => Config.WithdrawFromPublicAccount,
+                setValue: value => Config.WithdrawFromPublicAccount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Deposit To Public Account",
-                getValue: () => Config.TransferToPublic,
-                setValue: value => Config.TransferToPublic = value
+                getValue: () => Config.DepositToPublicAccount,
+                setValue: value => Config.DepositToPublicAccount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Increase Transfer Amount",
-                getValue: () => Config.RaiseAmount,
-                setValue: value => Config.RaiseAmount = value
+                getValue: () => Config.IncreaseTransferAmount,
+                setValue: value => Config.IncreaseTransferAmount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Decrease Transfer Amount",
-                getValue: () => Config.LowerAmount,
-                setValue: value => Config.LowerAmount = value
+                getValue: () => Config.DecreaseTransferAmount,
+                setValue: value => Config.DecreaseTransferAmount = value
             );
-            configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
+            //configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Tax Percent",
                 min: 0,
                 max: 100,
-                getValue: () => Config.TaxPercentile,
-                setValue: value => Config.TaxPercentile = value
+                getValue: () => Config.TaxPercent,
+                setValue: value => Config.TaxPercent = value
             );
             SendTaxPercentileToAllPlayers();
         }
@@ -129,7 +133,7 @@ namespace MoneyManagementMod
         {
             if (Game1.IsMasterGame)
             {
-                var message = new Messages { TaxPercentile = Config.TaxPercentile };
+                var message = new Messages { TaxPercentile = Config.TaxPercent };
                 Helper.Multiplayer.SendMessage(message, "TaxPercentileUpdate", new[] { this.ModManifest.UniqueID });
             }
         }
@@ -149,7 +153,7 @@ namespace MoneyManagementMod
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "TaxPercentileUpdate")
             {
                 var message = e.ReadAs<Messages>();
-                Config.TaxPercentile = message.TaxPercentile;
+                Config.TaxPercent = message.TaxPercentile;
             }
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "TransferRequest" && Game1.IsMasterGame)
             {
@@ -273,14 +277,14 @@ namespace MoneyManagementMod
             PlayerData playerData = _playerData[playerID];
             int[] transferAmounts = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
             int currentIndex = Array.IndexOf(transferAmounts, playerData.TransferAmount);
-            if (Config.TransferToPublic.JustPressed() || Config.TransferFromPublic.JustPressed())
+            if (Config.DepositToPublicAccount.JustPressed() || Config.WithdrawFromPublicAccount.JustPressed())
             {
                 if (!Game1.IsMasterGame)
                 {
                     var message = new Messages
                     {
                         TransferAmount = playerData.TransferAmount,
-                        TransferType = Config.TransferToPublic.JustPressed() ? "ToPublic" : "FromPublic",
+                        TransferType = Config.DepositToPublicAccount.JustPressed() ? "ToPublic" : "FromPublic",
                         PlayerID = playerID
                     };
                     Helper.Multiplayer.SendMessage(message, "TransferRequest", new[] { this.ModManifest.UniqueID });
@@ -288,14 +292,14 @@ namespace MoneyManagementMod
                 else
                 {
                     Game1.player.CanMove = false;
-                    if (Config.TransferToPublic.JustPressed())
+                    if (Config.DepositToPublicAccount.JustPressed())
                         _publicMoney.TransferToPublic(playerData.TransferAmount, Game1.player.UniqueMultiplayerID);
                     else
                         _publicMoney.TransferFromPublic(playerData.TransferAmount, Game1.player.UniqueMultiplayerID);
                     Game1.player.CanMove = true;
                 }
             }
-            else if (Config.LowerAmount.JustPressed())
+            else if (Config.DecreaseTransferAmount.JustPressed())
             {
                 Game1.player.CanMove = false; 
                 currentIndex--;
@@ -305,7 +309,7 @@ namespace MoneyManagementMod
                 }
                 Game1.player.CanMove = true;
             }
-            else if (Config.RaiseAmount.JustPressed())
+            else if (Config.IncreaseTransferAmount.JustPressed())
             {
                 Game1.player.CanMove = false;
                 currentIndex++;
@@ -451,7 +455,7 @@ namespace MoneyManagementMod
         }
         private int TaxMoney(int amount)
         {
-            decimal taxRate = Config.TaxPercentile / 100m;
+            decimal taxRate = Config.TaxPercent / 100m;
             int transferAmount = (int)Math.Round(amount * taxRate);
             _publicMoney.PublicBal += transferAmount;
             Game1.player.Money -= transferAmount;
