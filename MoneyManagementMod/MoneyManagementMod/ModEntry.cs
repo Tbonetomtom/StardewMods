@@ -68,20 +68,7 @@ namespace MoneyManagementMod
                 save: () => Helper.WriteConfig(this.Config)
             );
             // add some config options
-            configMenu.AddBoolOption(
-                mod: this.ModManifest,
-                name: () => "Display Currency HUD",
-                tooltip: () => "Toggle the rendering of the HUD.",
-                getValue: () => Config.RenderHUD,
-                setValue: value => Config.RenderHUD = value
-            );
-            configMenu.AddBoolOption(
-                mod: this.ModManifest,
-                name: () => "Distribute the Shipping Bin Money Out Equally ",
-                tooltip: () => "splits the proceeds from the sale of goods and crops equally among all online players in the shipping bin.",
-                getValue: () => Config.DistributeShippingBinMoneyEqually,
-                setValue: value => Config.DistributeShippingBinMoneyEqually = value
-            );
+
             configMenu.AddSectionTitle(
                mod: this.ModManifest,
                text: () => "Keybinds"
@@ -110,7 +97,29 @@ namespace MoneyManagementMod
                 getValue: () => Config.DecreaseTransferAmount,
                 setValue: value => Config.DecreaseTransferAmount = value
             );
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                text: () => "Misc"
+            );
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Display Currency HUD",
+                tooltip: () => "Toggle the rendering of the HUD.",
+                getValue: () => Config.RenderHUD,
+                setValue: value => Config.RenderHUD = value
+            );
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Distribute Shipping Bin Equally",
+                tooltip: () => "splits the proceeds from the sale of goods and crops equally among all online players in the shipping bin.",
+                getValue: () => Config.DistributeShippingBinMoneyEqually,
+                setValue: value => Config.DistributeShippingBinMoneyEqually = value
+            );
             //configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
+            configMenu.AddParagraph(
+                mod: this.ModManifest,
+                text: () => "You can only change Tax percent in the main menu."
+            );
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Tax Percent",
@@ -119,6 +128,7 @@ namespace MoneyManagementMod
                 getValue: () => Config.TaxPercent,
                 setValue: value => Config.TaxPercent = value
             );
+
             SendTaxPercentileToAllPlayers();
         }
         private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
