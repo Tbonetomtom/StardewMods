@@ -12,6 +12,7 @@ using Netcode;
 using StardewValley.Monsters;
 using GenericModConfigMenu;
 using System.Reflection;
+using System.Linq;
 
 namespace MoneyManagementMod
 {
@@ -22,6 +23,7 @@ namespace MoneyManagementMod
         private Dictionary<int, Texture2D>? _backgrounds;
         private Texture2D? _Glow; //i was planning on using this to make the lights glow but i got lazy
         Vector2 position = new(0, 100); //i was planning on adding this to the config at some point
+        
         private readonly Dictionary<long, PlayerData> _playerData = new();
         public override void Entry(IModHelper helper)
         {
@@ -72,6 +74,13 @@ namespace MoneyManagementMod
                 tooltip: () => "Toggle the rendering of the HUD.",
                 getValue: () => Config.RenderHUD,
                 setValue: value => Config.RenderHUD = value
+            );
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Distribute the Shipping Bin Money Out Equally ",
+                tooltip: () => "splits the proceeds from the sale of goods and crops equally among all online players in the shipping bin.",
+                getValue: () => Config.DistributeShippingBinMoneyEqually,
+                setValue: value => Config.DistributeShippingBinMoneyEqually = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
@@ -214,27 +223,48 @@ namespace MoneyManagementMod
         }
         private void OnDayEnding(object? sender, DayEndingEventArgs e)
         {
-
-            TaxMoney(CalculateShippingBinValue());
+            int shippingBinValue = CalculateShippingBinValue();
+            if (Config.DistributeShippingBinMoneyEqually)
+            {
+                DistributeShippingBinMoney(shippingBinValue);
+            }
+            else
+            {
+                TaxMoney(shippingBinValue);
+            }
+            
 
             SendPublicBalToAllPlayers();
         }
-
-     /*   private void Commands(string command, string[] args)
+        private void DistributeShippingBinMoney(int shippingBinValue)
         {
-            if (command == "player_setmoney")
+            int numberOfPlayers = Game1.getAllFarmers().Count();
+            int amountPerPlayer = shippingBinValue / numberOfPlayers;
+
+            foreach (Farmer player in Game1.getAllFarmers())
             {
-                this.Monitor.Log(command, LogLevel.Debug);
-                Game1.player.Money = int.Parse(args[0]);
-                this.Monitor.Log($"OK, set your money to {args[0]}.", LogLevel.Info);
+                player.Money += amountPerPlayer;
             }
-            else if (command == "public_setmoney")
-            {
-                this.Monitor.Log(command, LogLevel.Debug);
-                _publicMoney.PublicBal = int.Parse(args[0]);
-                this.Monitor.Log($"OK, set your money to {args[0]}.", LogLevel.Info);
-            }
-        }*/
+
+            // Tax the remaining amount if the division is not exact
+            int remainingAmount = shippingBinValue % numberOfPlayers;
+            TaxMoney(remainingAmount);
+        }
+        /*   private void Commands(string command, string[] args)
+           {
+               if (command == "player_setmoney")
+               {
+                   this.Monitor.Log(command, LogLevel.Debug);
+                   Game1.player.Money = int.Parse(args[0]);
+                   this.Monitor.Log($"OK, set your money to {args[0]}.", LogLevel.Info);
+               }
+               else if (command == "public_setmoney")
+               {
+                   this.Monitor.Log(command, LogLevel.Debug);
+                   _publicMoney.PublicBal = int.Parse(args[0]);
+                   this.Monitor.Log($"OK, set your money to {args[0]}.", LogLevel.Info);
+               }
+           }*/
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)

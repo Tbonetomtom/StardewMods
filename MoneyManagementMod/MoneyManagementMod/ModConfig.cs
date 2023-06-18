@@ -11,6 +11,7 @@ namespace MoneyManagementMod
     {
         public int TaxPercentile { get; set; } = 10;
         public bool RenderHUD { get; set; } = true;
+        public bool DistributeShippingBinMoneyEqually { get; set; } = false;
         public KeybindList TransferFromPublic { get; set; } = KeybindList.Parse("Down, LeftStick + DPadDown");
         public KeybindList TransferToPublic { get; set; } = KeybindList.Parse("Up, LeftStick + DPadUp");
         public KeybindList RaiseAmount { get; set; } = KeybindList.Parse("Left, LeftStick + DPadLeft");
