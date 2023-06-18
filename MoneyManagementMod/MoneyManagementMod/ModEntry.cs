@@ -13,6 +13,7 @@ using StardewValley.Monsters;
 using GenericModConfigMenu;
 using System.Reflection;
 using System.Linq;
+using StardewValley.Locations;
 
 namespace MoneyManagementMod
 {
@@ -76,24 +77,28 @@ namespace MoneyManagementMod
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Withdraw From Public Account",
+                tooltip: () => "will add the amount specified from your private account to the public bal.",
                 getValue: () => Config.WithdrawFromPublicAccount,
                 setValue: value => Config.WithdrawFromPublicAccount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Deposit To Public Account",
+                tooltip: () => "will remove the amount specified from your private account to the public bal.",
                 getValue: () => Config.DepositToPublicAccount,
                 setValue: value => Config.DepositToPublicAccount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Increase Transfer Amount",
+                tooltip: () => "increases the amount of money you transfer to and from the public bal.",
                 getValue: () => Config.IncreaseTransferAmount,
                 setValue: value => Config.IncreaseTransferAmount = value
             );
             configMenu.AddKeybindList(
                 mod: this.ModManifest,
                 name: () => "Decrease Transfer Amount",
+                tooltip: () => "decreases the amount of money you transfer to and from the public bal.",
                 getValue: () => Config.DecreaseTransferAmount,
                 setValue: value => Config.DecreaseTransferAmount = value
             );
@@ -115,14 +120,15 @@ namespace MoneyManagementMod
                 getValue: () => Config.DistributeShippingBinMoneyEqually,
                 setValue: value => Config.DistributeShippingBinMoneyEqually = value
             );
-            //configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
+            configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
             configMenu.AddParagraph(
                 mod: this.ModManifest,
-                text: () => "You can only change Tax percent in the main menu."
+                text: () => "You can only change \"Tax percent\" in the main menu."
             );
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Tax Percent",
+                tooltip: () => "When players join, \"Tax Percent\" will automatically sync with the main player's game.",
                 min: 0,
                 max: 100,
                 getValue: () => Config.TaxPercent,
