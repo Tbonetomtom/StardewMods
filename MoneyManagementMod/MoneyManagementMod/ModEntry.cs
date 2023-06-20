@@ -263,7 +263,7 @@ namespace MoneyManagementMod
 
             foreach (Farmer player in Game1.getAllFarmers())
             {
-                player.Money += amountPerPlayer;
+                Game1.player.team.AddIndividualMoney(player, amountPerPlayer);
             }
 
             // Tax the remaining amount if the division is not exact
