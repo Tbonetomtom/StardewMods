@@ -244,31 +244,10 @@ namespace MoneyManagementMod
         private void OnDayEnding(object? sender, DayEndingEventArgs e)
         {
             int shippingBinValue = CalculateShippingBinValue();
-            if (Config.DistributeShippingBinMoneyEqually)
-            {
-                DistributeShippingBinMoney(shippingBinValue);
-            }
-            else
-            {
-                TaxMoney(shippingBinValue);
-            }
-            
 
+            this.Monitor.Log($"{shippingBinValue}", LogLevel.Debug);
+            TaxMoney(shippingBinValue);
             SendPublicBalToAllPlayers();
-        }
-        private void DistributeShippingBinMoney(int shippingBinValue)
-        {
-            int numberOfPlayers = Game1.getAllFarmers().Count();
-            int amountPerPlayer = shippingBinValue / numberOfPlayers;
-
-            foreach (Farmer player in Game1.getAllFarmers())
-            {
-                Game1.player.team.AddIndividualMoney(player, amountPerPlayer);
-            }
-
-            // Tax the remaining amount if the division is not exact
-            int remainingAmount = shippingBinValue % numberOfPlayers;
-            TaxMoney(remainingAmount);
         }
         /*   private void Commands(string command, string[] args)
            {
