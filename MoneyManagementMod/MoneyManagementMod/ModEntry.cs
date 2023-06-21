@@ -112,14 +112,14 @@ namespace MoneyManagementMod
                 tooltip: () => "Toggle the rendering of the HUD.",
                 getValue: () => Config.RenderHUD,
                 setValue: value => Config.RenderHUD = value
-            );
+            );/*
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => "Distribute Shipping Bin Equally",
                 tooltip: () => "splits the proceeds from the sale of goods and crops equally among all online players in the shipping bin.",
                 getValue: () => Config.DistributeShippingBinMoneyEqually,
                 setValue: value => Config.DistributeShippingBinMoneyEqually = value
-            );
+            );*/
             configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
             configMenu.AddParagraph(
                 mod: this.ModManifest,
