@@ -191,6 +191,14 @@ namespace MoneyManagementMod
             if (Context.IsWorldReady)
             {
                 long playerID = Game1.player.UniqueMultiplayerID;
+
+                // Check if the playerID is present in the dictionary
+                if (!_playerData.ContainsKey(playerID))
+                {
+                    // If not, create a new PlayerData instance and add it to the dictionary
+                    _playerData[playerID] = new PlayerData();
+                }
+
                 PlayerData playerData = _playerData[playerID];
 
                 if (playerData.CanTax)
