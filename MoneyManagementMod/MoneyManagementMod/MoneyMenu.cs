@@ -17,9 +17,9 @@ namespace MoneyManagementMod
         private Vector2 position;
         public int moneyShakeTimer;
 
-        public MoneyMenu(PublicMoney publicMoney, Vector2 position)
+        public MoneyMenu(PublicMoney publicMoney, int X, int Y)
         {
-            this.position = position;
+            position = new Vector2(X, Y);
             this.publicMoney = publicMoney;
 
         }

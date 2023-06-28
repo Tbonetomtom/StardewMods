@@ -104,7 +104,7 @@ namespace MoneyManagementMod
             );
             configMenu.AddSectionTitle(
                 mod: this.ModManifest,
-                text: () => "Misc"
+                text: () => "HUD"
             );
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
@@ -112,7 +112,33 @@ namespace MoneyManagementMod
                 tooltip: () => "Toggle the rendering of the HUD.",
                 getValue: () => Config.RenderHUD,
                 setValue: value => Config.RenderHUD = value
-            );/*
+            );
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Show HUD In Menus",
+                tooltip: () => "Perfect for setting your HUD position",
+                getValue: () => Config.ShowHUDInMenus,
+                setValue: value => Config.ShowHUDInMenus = value
+            );
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: () => "Move HUD X",
+                tooltip: () => "Moves the HUD along the X axis.",
+                getValue: () => Config.HUDX,
+                setValue: value => Config.HUDX = value
+            );
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: () => "Move HUD Y",
+                tooltip: () => "Moves the HUD along the Y axis.",
+                getValue: () => Config.HUDY,
+                setValue: value => Config.HUDY = value
+            );
+            configMenu.AddSectionTitle(
+                mod: this.ModManifest,
+                text: () => "Misc"
+            );
+            /*
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => "Distribute Shipping Bin Equally",
@@ -227,7 +253,19 @@ namespace MoneyManagementMod
             {
                 long playerID = Game1.player.UniqueMultiplayerID;
                 PlayerData playerData = _playerData[playerID];
-                
+
+                if (e.NewMenu is ShopMenu)
+                {
+                    playerData.CanTax = true;
+                }
+                else
+                {
+                    playerData.CanTax = false;
+                } 
+                if (Config.ShowHUDInMenus) {
+                    playerData.DrawHUD = true;
+                    return;
+                }
                 if (e.NewMenu is null)
                 {
                     playerData.DrawHUD = true;
@@ -236,14 +274,6 @@ namespace MoneyManagementMod
                 {
                     playerData.DrawHUD = false;
                     
-                }
-                if (e.NewMenu is ShopMenu)
-                {
-                    playerData.CanTax = true;
-                }
-                else
-                {
-                    playerData.CanTax = false;
                 }
             }
         }
@@ -380,10 +410,10 @@ namespace MoneyManagementMod
                 {
                     if (_backgrounds.TryGetValue(playerData.TransferAmount, out Texture2D? background))
                     {
-                        Game1.spriteBatch.Draw(background, new Rectangle((int)position.X + 4, (int)position.Y + 8, 260, 60), Color.White);
+                        Game1.spriteBatch.Draw(background, new Rectangle(Config.HUDX + 4, Config.HUDY + 8, 260, 60), Color.White);
                     }
 
-                    MoneyMenu customMoneyMenu = new(_publicMoney, position);
+                    MoneyMenu customMoneyMenu = new(_publicMoney, Config.HUDX, Config.HUDY);
                     customMoneyMenu.draw(Game1.spriteBatch);
                 }
             }
