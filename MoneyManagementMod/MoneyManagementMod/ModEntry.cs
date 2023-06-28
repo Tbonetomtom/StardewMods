@@ -177,7 +177,6 @@ namespace MoneyManagementMod
                 if (message.TransferType == "ToPublic")
                 {
                     _publicMoney.TransferToPublic(message.TransferAmount, message.PlayerID);
-                    this.Monitor.Log("ToPublic", LogLevel.Debug);
                 }
                     
                 else
@@ -439,7 +438,8 @@ namespace MoneyManagementMod
             if (item is StardewValley.Object obj)
             {
                 int basePrice = obj.sellToStorePrice();
-                value = (int)(basePrice);
+                int stackSize = obj.Stack;
+                value = (int)(basePrice * stackSize); // calculate value based on stack size
             }
 
             return value;
