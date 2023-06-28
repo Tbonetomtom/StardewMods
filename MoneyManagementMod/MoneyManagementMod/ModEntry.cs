@@ -121,10 +121,6 @@ namespace MoneyManagementMod
                 setValue: value => Config.DistributeShippingBinMoneyEqually = value
             );*/
             configMenu.SetTitleScreenOnlyForNextOptions(mod: this.ModManifest, true);
-            configMenu.AddParagraph(
-                mod: this.ModManifest,
-                text: () => "You can only change \"Tax percent\" in the main menu."
-            );
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Tax Percent",
@@ -134,7 +130,10 @@ namespace MoneyManagementMod
                 getValue: () => Config.TaxPercent,
                 setValue: value => Config.TaxPercent = value
             );
-
+           configMenu.AddParagraph(
+                mod: this.ModManifest,
+                text: () => "You can only change \"Tax percent\" in the main menu."
+            );
             SendTaxPercentileToAllPlayers();
         }
         private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
