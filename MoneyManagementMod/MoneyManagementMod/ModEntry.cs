@@ -39,10 +39,10 @@ namespace MoneyManagementMod
             for (int i = 1; i <= 8; i++)
             {
                 int transferAmount = (int)Math.Pow(10, i - 1);
-                _backgrounds[transferAmount] = helper.Content.Load<Texture2D>($"assets/background{i}.png", ContentSource.ModFolder);
+                _backgrounds[transferAmount] = helper.ModContent.Load<Texture2D>($"assets/background{i}.png");
             }
 
-            _Glow = helper.Content.Load<Texture2D>("assets/GlowEffect.png", ContentSource.ModFolder);
+            _Glow = helper.ModContent.Load<Texture2D>("assets/GlowEffect.png");
             /* This code is not included in the final version of the code.
             // this is for debugging
             helper.ConsoleCommands.Add("player_setmoney", "Sets the player's money.\n\nUsage: player_setmoney <value>\n- value: the integer amount.", this.Commands);
